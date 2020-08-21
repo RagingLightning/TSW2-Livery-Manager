@@ -26,6 +26,8 @@ namespace TSW2_Livery_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
+        //COUNT OF LIVERIES
+        readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
         //START OF LIVERY
         readonly byte[] SOL = new byte[] { 0, 3, 0, 0, 0, 0x49, 0x44 };
         //END OF LIVERIES
@@ -60,12 +62,14 @@ namespace TSW2_Livery_Manager
             if (Cfg.ContainsKey("GamePath"))
             {
                 txtGameDir.Text = Cfg["GamePath"];
-                LoadGameLiveries();
+                string GameStatus = LoadGameLiveries();
+                if (GameStatus != "OK") lblMessage.Content += $"ERROR WHILE LOADING GAME LIVERY {GameStatus}";
             }
             if (Cfg.ContainsKey("LibraryPath"))
             {
                 txtLibDir.Text = Cfg["LibraryPath"];
-                LoadLibraryLiveries();
+                string LibraryStatus = LoadLibraryLiveries();
+                if (LibraryStatus != "OK") lblMessage.Content += $"ERROR WHILE LOADING LIBRARY LIVERY {LibraryStatus}";
             }
 
         }
@@ -154,7 +158,7 @@ namespace TSW2_Livery_Manager
             return FindStart;
         }
 
-        private bool LoadGameLiveries()
+        private string LoadGameLiveries()
         {
             SplitFile.Clear();
             byte[] LiveryFile = File.ReadAllBytes(Cfg["GamePath"]);
@@ -168,21 +172,24 @@ namespace TSW2_Livery_Manager
 
             for (int i = 1; i <= 30; i++)
             {
-                byte[] LiveryData = null;
                 int LiveryStart = LocateInByteArray(LiveryFile, SOL, LiveryEnd);
-                if (LiveryStart != -1)
-                {
+                if (LiveryStart == -1) break;
                 LiveryEnd = LocatesInByteArray(LiveryFile, new byte[][] { SOL, EOL }, LiveryStart + 1);
-                    if (LiveryEnd == -1) return false;
-                    LiveryData = new byte[LiveryEnd - LiveryStart];
+                if (LiveryEnd == -1)
+                    return $"!{i}/{LiveryStart}-{LiveryEnd}!";
+                byte[] LiveryData = new byte[LiveryEnd - LiveryStart];
                 Array.Copy(LiveryFile, LiveryStart, LiveryData, 0, LiveryData.Length);
                 SplitFile.Add(i, LiveryData);
-                }
             }
+
+            byte[] Footer = new byte[LiveryFile.Length - LiveryEnd];
+            Array.Copy(LiveryFile, LiveryEnd, Footer, 0, Footer.Length);
+            SplitFile.Add(31, Footer);
+
             return UpdateLocalGameLiveries();
         }
 
-        private bool UpdateLocalGameLiveries()
+        private string UpdateLocalGameLiveries()
         {
             lstGameLiveries.Items.Clear();
             for (int i = 1; i <= 30; i++)
@@ -190,11 +197,11 @@ namespace TSW2_Livery_Manager
                 byte[] LiveryData;
                 SplitFile.TryGetValue(i, out LiveryData);
                 string Display = LoadLivery(LiveryData);
-                if (Display == null) return false;
+                if (Display == null) return $"!L{i}!";
 
                 lstGameLiveries.Items.Add($"({i}): {Display}");
             }
-            return true;
+            return "OK";
         }
 
         private string LoadLibraryLiveries()
@@ -385,6 +392,7 @@ namespace TSW2_Livery_Manager
                 byte[] Contents = File.ReadAllBytes(Dialog.FileName);
                 File.WriteAllBytes(Cfg["GamePath"], Contents);
             }
+            LoadGameLiveries();
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -398,6 +406,8 @@ namespace TSW2_Livery_Manager
                 if (Data != null)
                     AllData = AllData.Concat(Data).ToArray();
             }
+            int CountLocation = LocateInByteArray(AllData, COL) + COL.Length;
+            AllData[CountLocation] = (byte)(SplitFile.Count() - 2);
             File.WriteAllBytes(Cfg["GamePath"], AllData);
         }
 
