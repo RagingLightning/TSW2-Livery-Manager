@@ -1,22 +1,10 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Net.Configuration;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ookii.Dialogs.Wpf;
 
 namespace TSW2_Livery_Manager
@@ -363,7 +351,7 @@ namespace TSW2_Livery_Manager
                 txtGameDir.Text = Dialog.SelectedPath;
                 saveCfg();
             }
-            UpdateLocalGameLiveries();
+            LoadGameLiveries();
         }
 
         private void btnBackup_Click(object sender, RoutedEventArgs e)
@@ -406,9 +394,12 @@ namespace TSW2_Livery_Manager
                 if (Data != null)
                     AllData = AllData.Concat(Data).ToArray();
             }
+            AllData = AllData.Concat(SplitFile[31]).ToArray();
+
             int CountLocation = LocateInByteArray(AllData, COL) + COL.Length;
             AllData[CountLocation] = (byte)(SplitFile.Count() - 2);
             File.WriteAllBytes(Cfg["GamePath"], AllData);
+            LoadGameLiveries();
         }
 
         private void btnReset_Click(object sender, RoutedEventArgs e)

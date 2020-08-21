@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TSW2_Livery_Manager"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" ResizeMode="CanMinimize">
+        Title="TSW2 Livery Manager by RagingLightning" Height="450" Width="800" ResizeMode="CanMinimize">
     <Grid>
         <Rectangle Fill="#FFFFC879" HorizontalAlignment="Left" Height="255" Margin="22,22,0,0" Stroke="Black" VerticalAlignment="Top" Width="320"/>
         <Rectangle Fill="#FFC2FF79" HorizontalAlignment="Left" Height="255" Margin="452,22,0,0" Stroke="Black" VerticalAlignment="Top" Width="320"/>

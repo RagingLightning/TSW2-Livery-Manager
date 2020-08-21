@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace TSW2_Livery_Manager
+namespace TSW2LM
 {
     /// <summary>
     /// Interaction logic for App.xaml

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSW2 Livery Manager", "TSW2 Livery Manager.csproj", "{E52C3AB7-78A0-4FA8-BD62-2E594CEE99D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSW2LM", "TSW2LM.csproj", "{5C950AC4-D4B8-4C1C-AC59-DA1507501F5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E52C3AB7-78A0-4FA8-BD62-2E594CEE99D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E52C3AB7-78A0-4FA8-BD62-2E594CEE99D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E52C3AB7-78A0-4FA8-BD62-2E594CEE99D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E52C3AB7-78A0-4FA8-BD62-2E594CEE99D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C950AC4-D4B8-4C1C-AC59-DA1507501F5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C950AC4-D4B8-4C1C-AC59-DA1507501F5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C950AC4-D4B8-4C1C-AC59-DA1507501F5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C950AC4-D4B8-4C1C-AC59-DA1507501F5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {E564DD1F-F608-4AB9-B281-9B165DB10451}
+		SolutionGuid = {3FED52CB-7A00-405C-9431-E34E7D0D9F93}
 	EndGlobalSection
 EndGlobal
