@@ -7,6 +7,9 @@ using System.Windows;
 using System.Windows.Controls;
 using Ookii.Dialogs.Wpf;
 using TSW2LM;
+using System.Net;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace TSW2_Livery_Manager
 {
@@ -16,6 +19,7 @@ namespace TSW2_Livery_Manager
     public partial class MainWindow : Window
     {
         private const int MAX_GAME_LIVERIES = 30;
+        private const string VERSION = "0.0.2";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -43,10 +47,15 @@ namespace TSW2_Livery_Manager
         Dictionary<int, byte[]> SplitFile = new Dictionary<int, byte[]>();
 
         private bool Useable = true;
-        
+
+        [DllImport("Kernel32.dll")]
+        public static extern bool AttachConsole(int processId);
+
         public MainWindow()
         {
+
             InitializeComponent();
+            AttachConsole(-1);
 
             Log.AddLogFile("TSW2LM.log", Log.LogLevel.INFO);
             if (Environment.GetCommandLineArgs().Contains("-debug"))
@@ -56,6 +65,31 @@ namespace TSW2_Livery_Manager
             }
 
             LoadCfg();
+
+            if (!Cfg.ContainsKey("NoUpdate") || Cfg["NoUpdate"] != "1")
+            {
+                try
+                {
+                    Log.AddLogMessage("Checking for updates...", "MW::<init>");
+                    WebRequest UpdateRequest = WebRequest.Create("https://raw.githubusercontent.com/RagingLightning/TSW2-Livery-Manager/deploy/version.dat");
+                    string UpdateResponse = new StreamReader(UpdateRequest.GetResponse().GetResponseStream()).ReadToEnd();
+                    string[] NewVersion = UpdateResponse.Split('.');
+                    string[] CurrentVersion = VERSION.Split('.');
+                    for (int i = 0; i < NewVersion.Length; i++)
+                    {
+                        if (int.Parse(NewVersion[i]) > int.Parse(CurrentVersion[i]))
+                        {
+                            new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/v{UpdateResponse}");
+                            Log.AddLogMessage($"New Version available: {VERSION}->{UpdateResponse}", "MW::<init>");
+                        }
+                    }
+                }
+                catch (WebException e)
+                {
+                    Log.AddLogMessage($"Unable to check for updates: {e.Message}", "MW::<init>", Log.LogLevel.DEBUG);
+                }
+                
+            }
 
             if (Cfg.ContainsKey("GamePath"))
             {
@@ -82,10 +116,10 @@ namespace TSW2_Livery_Manager
                 string[] ConfigFileEntries = ConfigFile.Split(';');
                 foreach (string ConfigFileEntry in ConfigFileEntries)
                 {
+                    if (ConfigFileEntry == "") continue;
                     string key = ConfigFileEntry.Split('=')[0];
                     string val = ConfigFileEntry.Split('=')[1];
-                    Log.AddLogMessage($"|> Config option {key} is set to {val}","MW::LoadCfg",Log.LogLevel.DEBUG);
-                    if (ConfigFileEntry == "") continue;
+                    Log.AddLogMessage($"|> Config option {key} is set to {val}", "MW::LoadCfg", Log.LogLevel.DEBUG);
                     Cfg.Add(key, val);
                 }
                 Log.AddLogMessage("Config loaded","MW::LoadCfg",Log.LogLevel.DEBUG);
@@ -277,7 +311,6 @@ namespace TSW2_Livery_Manager
         {
             if (liveryData == null) return "<empty>";
             int NameStart = LocateInByteArray(liveryData, SON, SONs) + SON.Length;
-            Console.WriteLine($"--{BitConverter.ToString(liveryData,NameStart-SON.Length+29,1)};{BitConverter.ToString(liveryData,NameStart - SON.Length + 47,1)}");
             if (NameStart == -1) return null;
             int NameEnd = LocateInByteArray(liveryData, EON, NameStart);
             if (NameEnd == -1) return null;
@@ -296,7 +329,6 @@ namespace TSW2_Livery_Manager
             byte[] ModelArray = new byte[ModelEnd - ModelStart];
             Array.Copy(liveryData, ModelStart, ModelArray, 0, ModelArray.Length);
             string Model =  System.Text.Encoding.UTF8.GetString(ModelArray);
-            Console.WriteLine(Model);
             return Model.Split('.')[Model.Split('.').Length - 1];
         }
 
