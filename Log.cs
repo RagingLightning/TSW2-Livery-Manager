@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace TSW2LM
 {
     class Log
     {
-        private static Dictionary<string, LogLevel> LogPaths;
+        private static Dictionary<string, LogLevel> LogPaths = new Dictionary<string, LogLevel>();
 
         public static LogLevel ConsoleLevel = LogLevel.INFO;
 
@@ -35,7 +36,11 @@ namespace TSW2LM
         {
             string Timestamp = DateTime.Now.ToString("MMddTHH:mm:ss.fff");
             string LogLine = $"[{level.ToString()}] {Timestamp} {stack} | {message}\n";
-            if (ConsoleLevel >= level) Console.Write(LogLine);
+            if (ConsoleLevel >= level)
+            {
+                Trace.Write(LogLine);
+                Console.Write(LogLine);
+            }
             foreach (KeyValuePair<string, LogLevel> p in LogPaths.Where(pair => pair.Value >= level))
             {
                 File.AppendAllText(p.Key, LogLine);

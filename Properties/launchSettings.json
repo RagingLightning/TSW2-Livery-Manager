@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TSW2LM": {
+      "commandName": "Project",
+      "commandLineArgs": "-debug"
+    }
+  }
+}

@@ -7,6 +7,10 @@ using System.Windows;
 using System.Windows.Controls;
 using Ookii.Dialogs.Wpf;
 using TSW2LM;
+using System.Net;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.ComponentModel;
 
 namespace TSW2_Livery_Manager
 {
@@ -16,6 +20,7 @@ namespace TSW2_Livery_Manager
     public partial class MainWindow : Window
     {
         private const int MAX_GAME_LIVERIES = 30;
+        private const string VERSION = "0.0.2";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -42,11 +47,13 @@ namespace TSW2_Livery_Manager
         //MAX_GAME_LIVERIES+1 - footer data
         Dictionary<int, byte[]> SplitFile = new Dictionary<int, byte[]>();
 
-        private bool Useable = true;
-        
+        [DllImport("Kernel32.dll")]
+        public static extern bool AttachConsole(int processId);
+
         public MainWindow()
         {
-            InitializeComponent();
+
+            AttachConsole(-1);
 
             Log.AddLogFile("TSW2LM.log", Log.LogLevel.INFO);
             if (Environment.GetCommandLineArgs().Contains("-debug"))
@@ -56,6 +63,34 @@ namespace TSW2_Livery_Manager
             }
 
             LoadCfg();
+
+            if (!Cfg.ContainsKey("NoUpdate") || Cfg["NoUpdate"] != "1")
+            {
+                try
+                {
+                    Log.AddLogMessage("Checking for updates...", "MW::<init>");
+                    WebRequest UpdateRequest = WebRequest.Create("https://raw.githubusercontent.com/RagingLightning/TSW2-Livery-Manager/deploy/version.dat");
+                    string UpdateResponse = new StreamReader(UpdateRequest.GetResponse().GetResponseStream()).ReadToEnd();
+                    Log.AddLogMessage($"Got version information: {VERSION}->{UpdateResponse}", "MW::<init>");
+                    string[] NewVersion = UpdateResponse.Split('.');
+                    string[] CurrentVersion = VERSION.Split('.');
+                    for (int i = 0; i < NewVersion.Length; i++)
+                    {
+                        if (int.Parse(NewVersion[i]) > int.Parse(CurrentVersion[i]))
+                        {
+                            new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/v{UpdateResponse}").ShowDialog();
+                        }
+                    }
+                }
+                catch (WebException e)
+                {
+                    Log.AddLogMessage($"Unable to check for updates: {e.Message}", "MW::<init>", Log.LogLevel.DEBUG);
+                }
+                
+            }
+
+            InitializeComponent();
+            DataContext = new Data();
 
             if (Cfg.ContainsKey("GamePath"))
             {
@@ -82,10 +117,10 @@ namespace TSW2_Livery_Manager
                 string[] ConfigFileEntries = ConfigFile.Split(';');
                 foreach (string ConfigFileEntry in ConfigFileEntries)
                 {
+                    if (ConfigFileEntry == "") continue;
                     string key = ConfigFileEntry.Split('=')[0];
                     string val = ConfigFileEntry.Split('=')[1];
-                    Log.AddLogMessage($"|> Config option {key} is set to {val}","MW::LoadCfg",Log.LogLevel.DEBUG);
-                    if (ConfigFileEntry == "") continue;
+                    Log.AddLogMessage($"|> Config option {key} is set to {val}", "MW::LoadCfg", Log.LogLevel.DEBUG);
                     Cfg.Add(key, val);
                 }
                 Log.AddLogMessage("Config loaded","MW::LoadCfg",Log.LogLevel.DEBUG);
@@ -191,7 +226,7 @@ namespace TSW2_Livery_Manager
                     if (LiveryEnd == -1)
                     {
                         Log.AddLogMessage($"Non-Ending livery {i} starting at byte {LiveryStart}, aborting file parsing", "MW::LoadGameLiveries", Log.LogLevel.WARNING);
-                        Useable = false;
+                        ((Data)DataContext).Useable = false;
                         return $"!NoEndLivery! {i}/{LiveryStart} - your game's livery file appears to be corrupted\n - restore it from a previously created backup\n - if the problem persists, or you are certain, the file is not corrupted, feel free to create an issue on github";
                     }
                     byte[] LiveryData = new byte[LiveryEnd - LiveryStart];
@@ -206,7 +241,7 @@ namespace TSW2_Livery_Manager
                 SplitFile.Add(MAX_GAME_LIVERIES+1, Footer);
                 Log.AddLogMessage($"Extracted game livery footer (bytes {LiveryEnd} - {LiveryFile.Length - 1})", "MW::LoadGameLiveries", Log.LogLevel.DEBUG);
 
-                Useable = true;
+                ((Data)DataContext).Useable = true;
 
                 return UpdateLocalGameLiveries();
             }
@@ -215,7 +250,7 @@ namespace TSW2_Livery_Manager
                 Cfg.Remove("GamePath");
                 SaveCfg();
                 Log.AddLogMessage($"FileNotFoundException: {e.FileName}", "MW::LoadGameLiveries", Log.LogLevel.WARNING);
-                Useable = false;
+                ((Data)DataContext).Useable = false;
                 return $"!FileNotFound! game livery file - Make sure, you selected the Trainsimworld2 folder";
             }
             catch (IOException e)
@@ -223,7 +258,7 @@ namespace TSW2_Livery_Manager
                 Cfg.Remove("GamePath");
                 SaveCfg();
                 Log.AddLogMessage($"IOException: {e.Message}", "MW::LoadGameLiveries", Log.LogLevel.WARNING);
-                Useable = false;
+                ((Data)DataContext).Useable = false;
                 return $"!IOException! game livery file - Make sure, you selected the Trainsimworld2 folder";
             }
         }
@@ -277,7 +312,6 @@ namespace TSW2_Livery_Manager
         {
             if (liveryData == null) return "<empty>";
             int NameStart = LocateInByteArray(liveryData, SON, SONs) + SON.Length;
-            Console.WriteLine($"--{BitConverter.ToString(liveryData,NameStart-SON.Length+29,1)};{BitConverter.ToString(liveryData,NameStart - SON.Length + 47,1)}");
             if (NameStart == -1) return null;
             int NameEnd = LocateInByteArray(liveryData, EON, NameStart);
             if (NameEnd == -1) return null;
@@ -296,7 +330,6 @@ namespace TSW2_Livery_Manager
             byte[] ModelArray = new byte[ModelEnd - ModelStart];
             Array.Copy(liveryData, ModelStart, ModelArray, 0, ModelArray.Length);
             string Model =  System.Text.Encoding.UTF8.GetString(ModelArray);
-            Console.WriteLine(Model);
             return Model.Split('.')[Model.Split('.').Length - 1];
         }
 
@@ -343,7 +376,8 @@ namespace TSW2_Livery_Manager
                 }
                 Log.AddLogMessage($"Exporting to file {FileName}.tsw2liv", "MW::ExportClick", Log.LogLevel.DEBUG);
                 File.WriteAllBytes($"{Cfg["LibraryPath"]}\\{FileName}.tsw2liv", LiveryData);
-                UpdateLibraryLiveries();
+                string Status = UpdateLibraryLiveries();
+                if (Status != "OK") lblMessage.Content = Status;
             }
             else
             {
@@ -362,8 +396,14 @@ namespace TSW2_Livery_Manager
                 string FileName = lstLibraryLiveries.SelectedItem.ToString().Split('<')[1].Split('>')[0];
                 byte[] LiveryData = File.ReadAllBytes($"{Cfg["LibraryPath"]}\\{FileName}");
                 if (!SetSelectedGameLivery(LiveryData))
+                {
                     lblMessage.Content = "!ImportWriteFail! - Something went wrong\n - if the issue persists, create an issue on github";
-                UpdateLocalGameLiveries();
+                }
+                else
+                {
+                    string Status = UpdateLocalGameLiveries();
+                    if (Status != "OK") lblMessage.Content = Status;
+                }
             }
             else
             {
@@ -393,7 +433,8 @@ namespace TSW2_Livery_Manager
                 SaveCfg();
                 Log.AddLogMessage($"Changed library path to {Cfg["LibraryPath"]}", "MW::LibDirClick");
             }
-            UpdateLibraryLiveries();
+            string Status = UpdateLibraryLiveries();
+            if (Status != "OK") lblMessage.Content = Status;
         }
 
         private void lstGame_Change(object sender, SelectionChangedEventArgs e)
@@ -417,7 +458,8 @@ namespace TSW2_Livery_Manager
                 SaveCfg();
                 Log.AddLogMessage($"Changed game path to {Cfg["GamePath"]}", "MW::GameDirClick");
             }
-            LoadGameLiveries();
+            string Status = LoadGameLiveries();
+            if (Status != "OK") lblMessage.Content = Status;
         }
 
         private void btnBackup_Click(object sender, RoutedEventArgs e)
@@ -448,7 +490,8 @@ namespace TSW2_Livery_Manager
                 File.WriteAllBytes(Cfg["GamePath"], Contents);
                 Log.AddLogMessage($"Restored from backup: {Dialog.FileName}", "MW::RestoreClick");
             }
-            LoadGameLiveries();
+            string Status = LoadGameLiveries();
+            if (Status != "OK") lblMessage.Content = Status;
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -470,14 +513,20 @@ namespace TSW2_Livery_Manager
             AllData[CountLocation] = (byte)(SplitFile.Count() - 2);
             File.WriteAllBytes(Cfg["GamePath"], AllData);
             Log.AddLogMessage("Saved local game liveries to disk", "MW::SaveClick", Log.LogLevel.DEBUG);
-            LoadGameLiveries();
+            string Status = LoadGameLiveries();
+            if (Status != "OK") lblMessage.Content = Status;
         }
 
         private void btnReset_Click(object sender, RoutedEventArgs e)
         {
             lblMessage.Content = "";
-            LoadGameLiveries();
-            UpdateLibraryLiveries();
+            string Status = LoadGameLiveries();
+            if (Status != "OK") { lblMessage.Content = Status; }
+            else
+            {
+                Status = UpdateLibraryLiveries();
+                if (Status != "OK") lblMessage.Content = Status;
+            }
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
@@ -491,7 +540,24 @@ namespace TSW2_Livery_Manager
             }
             int Id = int.Parse(lstGameLiveries.SelectedItem.ToString().Split('(')[1].Split(')')[0]);
             SplitFile.Remove(Id);
-            UpdateLocalGameLiveries();
+            string Status = UpdateLocalGameLiveries();
+            if (Status != "OK") lblMessage.Content = Status;
+        }
+    }
+
+    public class Data : INotifyPropertyChanged
+    {
+        private bool _useable = false;
+        public bool Useable
+        {
+            get { return _useable; }
+            set { _useable = value; OnPropertyChanged("Useable"); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
