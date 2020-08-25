@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿#nullable enable
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +21,7 @@ namespace TSW2_Livery_Manager
     public partial class MainWindow : Window
     {
         private const int MAX_GAME_LIVERIES = 30;
-        private const string VERSION = "0.0.2";
+        private const string VERSION = "0.0.3";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -125,6 +126,13 @@ namespace TSW2_Livery_Manager
                 }
                 Log.AddLogMessage("Config loaded","MW::LoadCfg",Log.LogLevel.DEBUG);
             }
+            else
+            {
+                Log.AddLogMessage("No config file found, applying default config...", "MW::LoadConfig", Log.LogLevel.DEBUG);
+                Cfg["GamePath"] = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\My Games\\Trainsimworld2\\Saved\\SaveGames\\UGCLiveries_0.sav";
+                SaveCfg();
+                Log.AddLogMessage("Default config applied", "MW::LoadCfg", Log.LogLevel.DEBUG);
+            }
         }
 
         private void SaveCfg()
@@ -159,6 +167,13 @@ namespace TSW2_Livery_Manager
             return LocateInByteArray(hay, needle, new int[] { }, start, end);
         }
 
+        /// <summary>searches a byte array for a given sequence of bytes</summary>
+        /// <param name="hay">The hay stack to be searched</param>
+        /// <param name="needle">The needle</param>
+        /// <param name="skip">The indices of bytes that should be ignored</param>
+        /// <param name="start">The index in the hay stack where search begins</param>
+        /// <param name="end">The index in the hay stack where searching ends</param>
+        /// <returns>the starting index of the first occurrence found</returns>
         private int LocateInByteArray(byte[] hay, byte[] needle, int[] skip, int start, int end)
         {
             if (hay == null || needle == null || hay.Length == 0 || needle.Length == 0 || needle.Length > hay.Length) return -1;
