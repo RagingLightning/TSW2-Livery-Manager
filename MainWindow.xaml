@@ -20,7 +20,7 @@
         <Button Content="🡐  EXPORT" HorizontalAlignment="Left" Height="41" Margin="343,235,0,0" VerticalAlignment="Top" Width="108" Click="btnExport_Click" IsEnabled="{Binding Path=Useable}"/>
         <Button Content="RESTORE" HorizontalAlignment="Left" Height="41" Margin="343,104,0,0" VerticalAlignment="Top" Width="108" Click="btnRestore_Click" IsEnabled="{Binding Path=Useable}"/>
         <Label x:Name="lblMessage" HorizontalAlignment="Left" Height="80" Margin="22,0,0,22" VerticalAlignment="Bottom" Width="748"/>
-        <Button Content="RESET" HorizontalAlignment="Left" Height="34" Margin="22,282,0,0" VerticalAlignment="Top" Width="240" Click="btnReset_Click" IsEnabled="{Binding Path=Useable}"/>
+        <Button Content="REFRESH" HorizontalAlignment="Left" Height="34" Margin="22,282,0,0" VerticalAlignment="Top" Width="240" Click="btnReset_Click" IsEnabled="{Binding Path=Useable}"/>
         <Button Content="SAVE" HorizontalAlignment="Left" Height="34" Margin="276,282,0,0" VerticalAlignment="Top" Width="240" Click="btnSave_Click" IsEnabled="{Binding Path=Useable}"/>
         <Button Content="DELETE" HorizontalAlignment="Left" Height="34" Margin="530,282,0,0" VerticalAlignment="Top" Width="240" Click="btnDelete_Click" IsEnabled="{Binding Path=Useable}"/>
 
