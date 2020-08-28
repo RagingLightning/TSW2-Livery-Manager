@@ -96,9 +96,15 @@ namespace TSW2_Livery_Manager
             if (Cfg.ContainsKey("GamePath"))
             {
                 Log.AddLogMessage("Loading GamePath Data...", "MW::<init>");
-                txtGameDir.Text = Cfg["GamePath"];
-                string GameStatus = LoadGameLiveries();
-                if (GameStatus != "OK") lblMessage.Content += $"ERROR WHILE LOADING GAME LIVERIES:\n{GameStatus}";
+                if (File.Exists(Cfg["GamePath"]) {
+                    txtGameDir.Text = Cfg["GamePath"];
+                    string GameStatus = LoadGameLiveries();
+                    if (GameStatus != "OK") lblMessage.Content += $"ERROR WHILE LOADING GAME LIVERIES:\n{GameStatus}";
+                }
+                else
+                {
+                    lblMessage.Content = $"ERROR WHILE LOADING GAME LIVERIES, please ensure you:\n - have created at least one livery in the game";
+                }
             }
             if (Cfg.ContainsKey("LibraryPath"))
             {
