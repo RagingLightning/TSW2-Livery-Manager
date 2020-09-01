@@ -231,6 +231,14 @@ namespace TSW2_Livery_Manager
                 byte[] LiveryFile = File.ReadAllBytes(Cfg["GamePath"]);
 
                 int HeaderEnd = LocateInByteArray(LiveryFile, SOL);
+                if (HeaderEnd < 0)
+
+                {
+                    Log.AddLogMessage("No livery found - at least one livery needs to already exist.", "MW::LoadGameLiveries",  Log.LogLevel.ERROR);
+                    ((Data)DataContext).Useable = false;
+                    return "Empty livery file - please ensure you've created at least one livery.";
+                }
+
                 byte[] Header = new byte[HeaderEnd];
                 Array.Copy(LiveryFile, Header, Header.Length);
                 SplitFile.Add(0, Header);
