@@ -21,7 +21,7 @@ namespace TSW2_Livery_Manager
     public partial class MainWindow : Window
     {
         private const int MAX_GAME_LIVERIES = 30;
-        private const string VERSION = "0.1.0";
+        private const string VERSION = "0.1.1";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
