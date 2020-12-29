@@ -1,4 +1,4 @@
-﻿#nullable enable
+﻿#nullable disable warnings
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -42,6 +42,9 @@ namespace TSW2_Livery_Manager
 
         readonly string ConfigPath = "TSW2LM.cfg";
         static Dictionary<string, string> Cfg = new Dictionary<string, string>();
+
+        bool jImportWarning = false;
+        bool jExportWarning = false;
 
         //0 - header data
         //1-MAX_GAME_LIVERIES - livery data
@@ -87,7 +90,7 @@ namespace TSW2_Livery_Manager
                 {
                     Log.AddLogMessage($"Unable to check for updates: {e.Message}", "MW::<init>", Log.LogLevel.DEBUG);
                 }
-                
+
             }
 
             InitializeComponent();
@@ -366,7 +369,7 @@ namespace TSW2_Livery_Manager
         {
             if (lstGameLiveries.SelectedItem == null || lstGameLiveries.SelectedIndex == -1) return null;
             int Id = int.Parse(((string)lstGameLiveries.SelectedItem).Split('(')[1].Split(')')[0]);
-            byte[] LiveryData = null;
+            byte[] LiveryData;
             SplitFile.TryGetValue(Id, out LiveryData);
             return LiveryData;
         }
@@ -384,6 +387,8 @@ namespace TSW2_Livery_Manager
 
         private void btnExport_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             lblMessage.Content = "";
             byte[] LiveryData = GetSelectedGameLivery();
             if(LiveryData != null)
@@ -417,6 +422,8 @@ namespace TSW2_Livery_Manager
 
         private void btnImport_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             lblMessage.Content = "";
             byte[] OldData = GetSelectedGameLivery();
             if (OldData == null && lstGameLiveries.SelectedItem != null && lstGameLiveries.SelectedIndex != -1 && lstLibraryLiveries.SelectedItem != null && lstLibraryLiveries.SelectedIndex != -1)
@@ -441,6 +448,64 @@ namespace TSW2_Livery_Manager
             }
         }
 
+        private void btnJExport_Click(object sender, RoutedEventArgs e)
+        {
+            if (!jExportWarning)
+            {
+                lblMessage.Content = "IMPORTANT!! - This feature is very experimental, make sure you have a backup of your liveries!!";
+                Log.AddLogMessage("First Click on JSON Export, warning and ignoring...","MW::JExportClick", Log.LogLevel.DEBUG);
+                jExportWarning = true;
+            }
+            else if (File.Exists("GvasConverter\\GvasConverter.exe"))
+            {
+                Log.AddLogMessage("Second Click on JSON Export, exporting game livery file to json...", "MW::JExportClick", Log.LogLevel.DEBUG);
+                SaveFileDialog Dialog = new SaveFileDialog();
+                Dialog.InitialDirectory = Cfg["LibraryPath"];
+                Dialog.Filter = "JSON-File (*.json)|*.json";
+                Dialog.DefaultExt = "*.json";
+                if (Dialog.ShowDialog() == true)
+                {
+                    Process.Start("GvasConverter\\GvasConverter.exe", $"\"{Cfg["GamePath"]}\" \"{Dialog.FileName}\"");
+                }
+                jExportWarning = false;
+            }
+            else
+            {
+                lblMessage.Content = "ERROR: 'GvasConverter.exe' could not be found, please make sure it is in a folder called GVASConverter.";
+                Log.AddLogMessage("Second Click on JSON Export, unable to find gvas coverter, aborting...", "MW::JExportClick", Log.LogLevel.WARNING);
+                jExportWarning = false;
+            }
+        }
+
+        private void btnJImport_Click(object sender, RoutedEventArgs e)
+        {
+            if (!jImportWarning)
+            {
+                lblMessage.Content = "IMPORTANT!! - This feature is very experimental, make sure you have a backup of your liveries!!";
+                Log.AddLogMessage("First Click on JSON Import, warning and ignoring...", "MW::JImportClick", Log.LogLevel.DEBUG);
+                jImportWarning = true;
+            }
+            else if (File.Exists("GvasConverter\\GvasConverter.exe"))
+            {
+                Log.AddLogMessage("Second Click on JSON Import, exporting game livery file to json...", "MW::JImportClick", Log.LogLevel.DEBUG);
+                OpenFileDialog Dialog = new OpenFileDialog();
+                Dialog.InitialDirectory = Cfg["LibraryPath"];
+                Dialog.Filter = "JSON-File (*.json)|*.json";
+                Dialog.DefaultExt = "*.json";
+                if (Dialog.ShowDialog() == true)
+                {
+                    Process.Start("GvasConverter\\GvasConverter.exe", $"{Dialog.FileName} {Cfg["GamePath"]}");
+                }
+                jImportWarning = false;
+            }
+            else
+            {
+                lblMessage.Content = "ERROR: 'GvasConverter.exe' could not be found, please make sure it is in a folder called GVASConverter.";
+                Log.AddLogMessage("Second Click on JSON Import, unable to find gvas coverter, aborting...", "MW::JImportClick", Log.LogLevel.WARNING);
+                jImportWarning = false;
+            }
+        }
+
         private void lstLibrary_Change(object sender, SelectionChangedEventArgs e)
         {
 
@@ -448,6 +513,8 @@ namespace TSW2_Livery_Manager
 
         private void btnLibDir_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             lblMessage.Content = "";
             VistaFolderBrowserDialog Dialog = new VistaFolderBrowserDialog();
             Dialog.Description = "Select a folder for all your liveries to be exported to";
@@ -473,6 +540,8 @@ namespace TSW2_Livery_Manager
 
         private void btnGameDir_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             lblMessage.Content = "";
             VistaFolderBrowserDialog Dialog = new VistaFolderBrowserDialog();
             Dialog.Description = "Select the TSW2 game folder";
@@ -493,6 +562,8 @@ namespace TSW2_Livery_Manager
 
         private void btnBackup_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             lblMessage.Content = "";
             SaveFileDialog Dialog = new SaveFileDialog();
             Dialog.InitialDirectory = Cfg["LibraryPath"];
@@ -508,6 +579,8 @@ namespace TSW2_Livery_Manager
 
         private void btnRestore_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             lblMessage.Content = "";
             OpenFileDialog Dialog = new OpenFileDialog();
             Dialog.Filter = "TSW2 Livery Backup  (*.tsw2bak)|*.tsw2bak";
@@ -525,6 +598,8 @@ namespace TSW2_Livery_Manager
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             Log.AddLogMessage("Saving local game liveries to disk...", "MW::SaveClick");
             lblMessage.Content = "";
             byte[] AllData = SplitFile[0];
@@ -548,6 +623,8 @@ namespace TSW2_Livery_Manager
 
         private void btnReset_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             lblMessage.Content = "";
             string Status = LoadGameLiveries();
             if (Status != "OK") { lblMessage.Content = Status; }
@@ -560,6 +637,8 @@ namespace TSW2_Livery_Manager
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
+            jImportWarning = false;
+            jExportWarning = false;
             lblMessage.Content = "";
             if (lstGameLiveries.SelectedItem == null ||lstGameLiveries.SelectedIndex == -1)
             {
