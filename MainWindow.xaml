@@ -5,26 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TSW2_Livery_Manager"
         mc:Ignorable="d"
-        Title="TSW2 Livery Manager by RagingLightning" Height="450" Width="800" ResizeMode="CanMinimize">
+        Title="TSW2 Livery Manager by RagingLightning" ResizeMode="CanResizeWithGrip" MinWidth="820" MinHeight="455" Width="820" Height="455">
     <Grid>
-        <Rectangle Fill="#FFFFC879" HorizontalAlignment="Left" Height="255" Margin="22,22,0,0" Stroke="Black" VerticalAlignment="Top" Width="320"/>
-        <Rectangle Fill="#FFC2FF79" HorizontalAlignment="Left" Height="255" Margin="452,22,0,0" Stroke="Black" VerticalAlignment="Top" Width="320"/>
-        <TextBox x:Name="txtGameDir" HorizontalAlignment="Left" Height="22" Margin="460,32,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="210" MaxLines="1"/>
-        <Button Content="Set Game Dir" HorizontalAlignment="Left" Height="22" Margin="677,32,0,0" VerticalAlignment="Top" Width="85" Click="btnGameDir_Click"/>
-        <ListBox x:Name="lstGameLiveries" HorizontalAlignment="Left" Height="205" Margin="460,62,0,0" VerticalAlignment="Top" Width="300" SelectionChanged="lstGame_Change" IsEnabled="{Binding Path=Useable}"/>
-        <Button Content="BACKUP!" HorizontalAlignment="Left" Height="82" Margin="343,22,0,0" VerticalAlignment="Top" Width="108" FontSize="24" FontWeight="Bold" Click="btnBackup_Click" IsEnabled="{Binding Path=Useable}"/>
-        <TextBox x:Name="txtLibDir" HorizontalAlignment="Left" Height="22" Margin="32,32,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="210" MaxLines="1"/>
-        <Button Content="Set Lib Dir" HorizontalAlignment="Left" Height="22" Margin="249,32,0,0" VerticalAlignment="Top" Width="85" Click="btnLibDir_Click"/>
-        <ListBox x:Name="lstLibraryLiveries" HorizontalAlignment="Left" Height="205" Margin="32,62,0,0" VerticalAlignment="Top" Width="300" SelectionChanged="lstLibrary_Change" IsEnabled="{Binding Path=Useable}"/>
-        <Button Content="IMPORT  🡒" HorizontalAlignment="Left" Height="36" Margin="343,165,0,0" VerticalAlignment="Top" Width="108" Click="btnImport_Click" IsEnabled="{Binding Path=Useable}"/>
-        <Button Content="🡐 EXPORT" HorizontalAlignment="Left" Height="35" Margin="343,241,0,0" VerticalAlignment="Top" Width="108" Click="btnExport_Click" IsEnabled="{Binding Path=Useable}"/>
-        <Button Content="JSON IMPORT" HorizontalAlignment="Left" Height="20" Margin="343,201,0,0" VerticalAlignment="Top" Width="108" Click="btnJImport_Click" IsEnabled="{Binding Path=Useable}"/>
-        <Button Content="JSON EXPORT" HorizontalAlignment="Left" Height="20" Margin="343,221,0,0" VerticalAlignment="Top" Width="108" Click="btnJExport_Click" IsEnabled="{Binding Path=Useable}"/>
-        <Button Content="RESTORE" HorizontalAlignment="Left" Height="41" Margin="343,104,0,0" VerticalAlignment="Top" Width="108" Click="btnRestore_Click" IsEnabled="{Binding Path=Useable}"/>
-        <Label x:Name="lblMessage" HorizontalAlignment="Left" Height="80" Margin="22,0,0,22" VerticalAlignment="Bottom" Width="748"/>
-        <Button Content="REFRESH" HorizontalAlignment="Left" Height="34" Margin="22,282,0,0" VerticalAlignment="Top" Width="240" Click="btnReset_Click" IsEnabled="{Binding Path=Useable}"/>
-        <Button Content="SAVE" HorizontalAlignment="Left" Height="34" Margin="276,282,0,0" VerticalAlignment="Top" Width="240" Click="btnSave_Click" IsEnabled="{Binding Path=Useable}"/>
-        <Button Content="DELETE" HorizontalAlignment="Left" Height="34" Margin="530,282,0,0" VerticalAlignment="Top" Width="240" Click="btnDelete_Click" IsEnabled="{Binding Path=Useable}"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="290*" MinHeight="290"/>
+            <RowDefinition Height="150*" MaxHeight="150" MinHeight="150"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="345*" MinWidth="345"/>
+            <ColumnDefinition Width="110*" MinWidth="110" MaxWidth="110"/>
+            <ColumnDefinition Width="345*" MinWidth="345"/>
+        </Grid.ColumnDefinitions>
+        <Rectangle Fill="#FFFFC879" Margin="10,10,10,10" Stroke="Black"/>
+        <Rectangle Fill="#FFC2FF79" Margin="10,10,10,10" Stroke="Black" Grid.Column="2"/>
+        <TextBox x:Name="txtGameDir" Height="22" Margin="20,30,115,-6" TextWrapping="NoWrap" VerticalAlignment="Top" MaxLines="1" Grid.Column="2"/>
+        <Button Content="Set Game Dir" Height="22" Margin="0,30,20,0" VerticalAlignment="Top" Click="btnGameDir_Click" Grid.Column="2" HorizontalAlignment="Right" Width="85"/>
+        <ListBox x:Name="lstGameLiveries" Margin="20,60,20,20" SelectionChanged="lstGame_Change" IsEnabled="{Binding Path=Useable}" Grid.Column="2"/>
+        <Button Content="BACKUP!" HorizontalAlignment="Center" Height="82" Margin="0,22,0,0" VerticalAlignment="Top" Width="108" FontSize="24" FontWeight="Bold" Click="btnBackup_Click" IsEnabled="{Binding Path=Useable}" Grid.Column="1"/>
+        <TextBox x:Name="txtLibDir" Height="22" Margin="20,30,105,0" TextWrapping="NoWrap" VerticalAlignment="Top" MaxLines="1"/>
+        <Button Content="Set Lib Dir" Height="22" Margin="0,30,20,0" VerticalAlignment="Top" Click="btnLibDir_Click" HorizontalAlignment="Right" Width="75"/>
+        <ListBox x:Name="lstLibraryLiveries" Margin="20,60,20,20" SelectionChanged="lstLibrary_Change" IsEnabled="{Binding Path=Useable}"/>
+        <Button Content="IMPORT  🡒" HorizontalAlignment="Center" Height="36" Margin="0,165,0,0" VerticalAlignment="Top" Width="108" Click="btnImport_Click" IsEnabled="{Binding Path=Useable}" Grid.Column="1"/>
+        <Button Content="🡐 EXPORT" HorizontalAlignment="Center" Height="35" Margin="0,241,0,0" VerticalAlignment="Top" Width="108" Click="btnExport_Click" IsEnabled="{Binding Path=Useable}" Grid.Column="1"/>
+        <Button Content="JSON IMPORT" HorizontalAlignment="Center" Height="20" Margin="0,201,0,0" VerticalAlignment="Top" Width="108" Click="btnJImport_Click" IsEnabled="{Binding Path=Useable}" Grid.Column="1"/>
+        <Button Content="JSON EXPORT" HorizontalAlignment="Center" Height="20" Margin="0,221,0,0" VerticalAlignment="Top" Width="108" Click="btnJExport_Click" IsEnabled="{Binding Path=Useable}" Grid.Column="1"/>
+        <Button Content="RESTORE" HorizontalAlignment="Center" Height="41" Margin="0,104,0,0" VerticalAlignment="Top" Width="108" Click="btnRestore_Click" IsEnabled="{Binding Path=Useable}" Grid.Column="1"/>
+        <Label x:Name="lblMessage" Height="80" Margin="20,0,20,20" VerticalAlignment="Bottom" Grid.ColumnSpan="3" Grid.Row="1"/>
+        <Button Content="REFRESH" Height="34" Margin="0,4,95,0" VerticalAlignment="Top" Click="btnReset_Click" IsEnabled="{Binding Path=Useable}" Grid.Row="1" HorizontalAlignment="Right" Width="240"/>
+        <Button Content="SAVE" Height="34" Margin="280,4,280,0" VerticalAlignment="Top" Click="btnSave_Click" IsEnabled="{Binding Path=Useable}" Grid.ColumnSpan="3" Grid.Row="1" Width="240"/>
+        <Button Content="DELETE" Height="34" Margin="95,4,0,0" VerticalAlignment="Top" Click="btnDelete_Click" IsEnabled="{Binding Path=Useable}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Width="240"/>
 
     </Grid>
 </Window>
