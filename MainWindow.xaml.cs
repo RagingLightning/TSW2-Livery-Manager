@@ -21,7 +21,7 @@ namespace TSW2_Livery_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string VERSION = "0.2.1";
+        private const string VERSION = "0.2.2a";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -80,45 +80,23 @@ namespace TSW2_Livery_Manager
                     switch (args[i])
                     {
                         case "-maxGameLiveries":
-                            int count = int.Parse(args[i + 1]);
+                            if (!int.TryParse(args[i+1], out int count)) PrintHelp();
                             Cfg.MaxGameLiveries = count > 30 ? count : 30;
                             break;
                         case "-noUpdate":
-                            Cfg.NoUpdate = true;
+                            if (!(args[i + 1] == "true" || args[i + 1] == "false")) PrintHelp();
+                            Cfg.NoUpdate = args[i + 1] == "true";
                             break;
-                        case "-update":
-                            Cfg.NoUpdate = false;
+                        case "-devUpdates":
+                            if (!(args[i + 1] == "true" || args[i + 1] == "false")) PrintHelp();
+                            Cfg.DevUpdates = args[i + 1] == "true";
                             break;
                         case "-reset":
                             Cfg.ApplyDefaults();
                             break;
                         case "-help":
                         case "-?":
-                            Console.WriteLine();
-                            Console.WriteLine("╔════════════════════════════════════════════════════════════════════╗");
-                            Console.WriteLine("║                  Train Sim World 2 Livery Manager                  ║");
-                            Console.WriteLine("╟──────────────────────── by RagingLightning ────────────────────────╢");
-                            Console.WriteLine("╚════════════════════════════════════════════════════════════════════╝");
-                            Console.WriteLine();
-                            Console.WriteLine("Command Line Arguments:");
-                            Console.WriteLine(" -help / -? :");
-                            Console.WriteLine("    Show this help page");
-                            Console.WriteLine();
-                            Console.WriteLine(" -reset :");
-                            Console.WriteLine("    Resets all config options back to default");
-                            Console.WriteLine();
-                            Console.WriteLine(" -noUpdate :");
-                            Console.WriteLine("    Disable automatic update check at startup");
-                            Console.WriteLine();
-                            Console.WriteLine(" -update :");
-                            Console.WriteLine("    Enable automatic update check on startup");
-                            Console.WriteLine();
-                            Console.WriteLine(" -maxGameLiveries <count> :");
-                            Console.WriteLine("    Change the number of in-game liveries !!EXPERIMENTAL!!");
-                            Console.WriteLine("    any number less than 30 reverts back to the default setting of 30");
-                            Console.WriteLine();
-                            FreeConsole();
-                            Application.Current.Shutdown();
+                            PrintHelp();
                             break;
                     }
                 } catch (Exception e)
@@ -138,19 +116,63 @@ namespace TSW2_Livery_Manager
                     Log.AddLogMessage($"Got version information: {VERSION}->{UpdateResponse}", "MW::<init>");
                     string[] NewVersion = UpdateResponse.Split('.');
                     string[] CurrentVersion = VERSION.Split('.');
+                    char CurrentSuffix = ' ';
+                    if (!int.TryParse(CurrentVersion[^1], out int _))
+                    {
+                        CurrentSuffix = VERSION.Last();
+                        CurrentVersion[^1] = CurrentVersion[^1].Split(CurrentSuffix)[0];
+                    }
+                    bool update = false;
+                    bool fullVersionUpdate = true;
                     for (int i = 0; i < NewVersion.Length; i++)
                     {
                         if (int.Parse(NewVersion[i]) > int.Parse(CurrentVersion[i]))
                         {
-                            new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/v{UpdateResponse}").ShowDialog();
+                            update = true;
                         }
+                        if (int.Parse(NewVersion[i]) != int.Parse(CurrentVersion[i])) fullVersionUpdate = false;
                     }
+                    if (update || (fullVersionUpdate && CurrentSuffix != ' ')) new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/v{UpdateResponse}").ShowDialog();
                 }
                 catch (WebException e)
                 {
                     Log.AddLogMessage($"Unable to check for updates: {e.Message}", "MW::<init>", Log.LogLevel.DEBUG);
                 }
 
+            }
+
+            if (Cfg.DevUpdates)
+            {
+                Log.AddLogMessage("Checking for dev updates...", "MW::<init>");
+                WebRequest UpdateRequest = WebRequest.Create("https://raw.githubusercontent.com/RagingLightning/TSW2-Livery-Manager/deploy/devversion.dat");
+                string UpdateResponse = new StreamReader(UpdateRequest.GetResponse().GetResponseStream()).ReadToEnd();
+                Log.AddLogMessage($"Got version information: {VERSION}->{UpdateResponse}", "MW::<init>");
+                string[] NewVersion = UpdateResponse.Split('.');
+                string[] CurrentVersion = VERSION.Split('.');
+                char NewSuffix = ' ';
+                char CurrentSuffix = ' ';
+                if (!int.TryParse(NewVersion[^1], out int _))
+                {
+                    NewSuffix = UpdateResponse.Last();
+                    NewVersion[^1] = NewVersion[^1].Split(NewSuffix)[0];
+                }
+                if (!int.TryParse(CurrentVersion[^1], out int _))
+                {
+                    CurrentSuffix = VERSION.Last();
+                    CurrentVersion[^1] = CurrentVersion[^1].Split(CurrentSuffix)[0];
+                }
+                bool update = false;
+                bool devUpdate = NewSuffix != ' ' && !update && (NewSuffix > CurrentSuffix || CurrentSuffix == ' ');
+                for (int i = 0; i < NewVersion.Length; i++)
+                {
+                    if (NewSuffix == ' ' && int.Parse(NewVersion[i]) > int.Parse(CurrentVersion[i]))
+                    {
+                        update = true;
+                    }
+                    if (int.Parse(NewVersion[i]) < int.Parse(CurrentVersion[i])) devUpdate = false;
+                }
+                if (update) new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/v{UpdateResponse}").ShowDialog();
+                else if (devUpdate) new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/dev-v{UpdateResponse}").ShowDialog();
             }
 
             InitializeComponent();
@@ -176,6 +198,35 @@ namespace TSW2_Livery_Manager
                 if (LibraryStatus != "OK") lblMessage.Content = $"ERROR WHILE LOADING LIBRARY LIVERIES:\n{LibraryStatus}";
             }
 
+        }
+
+        private void PrintHelp()
+        {
+            Console.WriteLine();
+            Console.WriteLine("╔════════════════════════════════════════════════════════════════════╗");
+            Console.WriteLine("║                  Train Sim World 2 Livery Manager                  ║");
+            Console.WriteLine("╟──────────────────────── by RagingLightning ────────────────────────╢");
+            Console.WriteLine("╚════════════════════════════════════════════════════════════════════╝");
+            Console.WriteLine();
+            Console.WriteLine("Command Line Arguments:");
+            Console.WriteLine(" -help / -? :");
+            Console.WriteLine("    Show this help page");
+            Console.WriteLine();
+            Console.WriteLine(" -reset :");
+            Console.WriteLine("    Resets all config options back to default");
+            Console.WriteLine();
+            Console.WriteLine(" -noUpdate :");
+            Console.WriteLine("    Disable automatic update check at startup");
+            Console.WriteLine();
+            Console.WriteLine(" -update :");
+            Console.WriteLine("    Enable automatic update check on startup");
+            Console.WriteLine();
+            Console.WriteLine(" -maxGameLiveries <count> :");
+            Console.WriteLine("    Change the number of in-game liveries !!EXPERIMENTAL!!");
+            Console.WriteLine("    any number less than 30 reverts back to the default setting of 30");
+            Console.WriteLine();
+            FreeConsole();
+            Application.Current.Shutdown();
         }
 
         private int LocateInByteArray(byte[] hay, byte[] needle)

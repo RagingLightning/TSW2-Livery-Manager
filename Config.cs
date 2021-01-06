@@ -35,12 +35,18 @@ namespace TSW2LM
                 File.AppendAllText(ConfigPath, $"NoUpdate=true;");
             }
 
+            if (_devUpdates)
+            {
+                Log.AddLogMessage($"|> Config option 'DevUpdates' set to 'true'", "Config::Save", Log.LogLevel.DEBUG);
+                File.AppendAllText(ConfigPath, $"DevUpdates=true;");
+            }
+
             Log.AddLogMessage("Config saved", "Config::Save", Log.LogLevel.DEBUG);
         }
 
         public void Load()
         {
-            ApplyDefaults();
+            ApplyDefaults(false);
             if (File.Exists(ConfigPath))
             {
                 Log.AddLogMessage("Loading Config...", "Config::Load", Log.LogLevel.DEBUG);
@@ -60,6 +66,7 @@ namespace TSW2LM
                             case "LibraryPath": _libraryPath = val; break;
                             case "MaxGameLiveries": _maxGameLiveries = int.Parse(val); break;
                             case "NoUpdate": _noUpdate = val == "true"; break;
+                            case "DevUpdates": _devUpdates = val == "true"; break;
                         }
                     }
                     catch (Exception)
@@ -74,11 +81,17 @@ namespace TSW2LM
 
         public void ApplyDefaults()
         {
+            ApplyDefaults(true);
+        }
+
+        private void ApplyDefaults(bool save)
+        {
             _gamePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\My Games\\Trainsimworld2\\Saved\\SaveGames\\UGCLiveries_0.sav";
             _libraryPath = "";
             _maxGameLiveries = 30;
             _noUpdate = false;
-            Save();
+            _devUpdates = false;
+            if (save) Save();
         }
 
         private string _gamePath;
@@ -101,6 +114,14 @@ namespace TSW2LM
             get { return _noUpdate; }
             set { _noUpdate = value; if (!_skipAutosave) Save(); }
         }
+
+        private bool _devUpdates;
+        public bool DevUpdates
+        {
+            get { return _devUpdates; }
+            set { _devUpdates = value; if (!_skipAutosave) Save(); }
+        }
+
 
         private int _maxGameLiveries;
         public int MaxGameLiveries
