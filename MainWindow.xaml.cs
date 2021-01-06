@@ -12,7 +12,6 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.ComponentModel;
-using System.Threading;
 
 namespace TSW2_Livery_Manager
 {
@@ -21,7 +20,7 @@ namespace TSW2_Livery_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string VERSION = "0.2.2a";
+        private const string VERSION = "0.3.0a";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
