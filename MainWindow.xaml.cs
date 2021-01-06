@@ -337,7 +337,7 @@ namespace TSW2_Livery_Manager
 
             if (Name == null || Model == null) return null;
 
-            return $"{Name} for {Model}";
+            return $"{Model} | {Name}";
         }
 
         private string getLiveryName(byte[] liveryData)
