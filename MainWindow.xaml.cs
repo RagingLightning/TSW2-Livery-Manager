@@ -20,7 +20,7 @@ namespace TSW2_Livery_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string VERSION = "0.3.0b";
+        private const string VERSION = "0.3.0c";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -121,13 +121,13 @@ namespace TSW2_Livery_Manager
                         CurrentSuffix = VERSION.Last();
                         CurrentVersion[^1] = CurrentVersion[^1].Split(CurrentSuffix)[0];
                     }
-                    bool update = false;
+                    bool update = true;
                     bool fullVersionUpdate = true;
                     for (int i = 0; i < NewVersion.Length; i++)
                     {
-                        if (int.Parse(NewVersion[i]) > int.Parse(CurrentVersion[i]))
+                        if (int.Parse(NewVersion[i]) < int.Parse(CurrentVersion[i]))
                         {
-                            update = true;
+                            update = false;
                         }
                         if (int.Parse(NewVersion[i]) != int.Parse(CurrentVersion[i])) fullVersionUpdate = false;
                     }
