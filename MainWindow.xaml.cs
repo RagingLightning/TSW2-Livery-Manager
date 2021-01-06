@@ -337,6 +337,11 @@ namespace TSW2_Livery_Manager
 
             if (Name == null || Model == null) return null;
 
+            if (Model.StartsWith("RF_"))
+            {
+                Model = Model.Remove(0, 3);
+            }
+
             return $"{Model} | {Name}";
         }
 
