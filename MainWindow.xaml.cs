@@ -663,7 +663,7 @@ namespace TSW2_Livery_Manager
             Log.AddLogMessage("Saving local game liveries to disk...", "MW::SaveClick");
             lblMessage.Content = "";
             byte[] AllData = SplitFile[0];
-            for (int i = 1; i < Cfg.MaxGameLiveries; i++)
+            for (int i = 1; i <= Cfg.MaxGameLiveries; i++)
             {
                 byte[] Data = null;
                 SplitFile.TryGetValue(i, out Data);
