@@ -214,11 +214,11 @@ namespace TSW2_Livery_Manager
             Console.WriteLine(" -reset :");
             Console.WriteLine("    Resets all config options back to default");
             Console.WriteLine();
-            Console.WriteLine(" -noUpdate :");
-            Console.WriteLine("    Disable automatic update check at startup");
+            Console.WriteLine(" -noUpdate <true|false> :");
+            Console.WriteLine("    Toggle automatic update check at startup");
             Console.WriteLine();
-            Console.WriteLine(" -update :");
-            Console.WriteLine("    Enable automatic update check on startup");
+            Console.WriteLine(" -devUpdate <true|false> :");
+            Console.WriteLine("    Toggle automatic dev-update check on startup");
             Console.WriteLine();
             Console.WriteLine(" -maxGameLiveries <count> :");
             Console.WriteLine("    Change the number of in-game liveries !!EXPERIMENTAL!!");
