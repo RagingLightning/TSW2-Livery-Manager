@@ -20,7 +20,7 @@ namespace TSW2_Livery_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string VERSION = "0.3.0c";
+        private const string VERSION = "0.3.0";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -80,7 +80,7 @@ namespace TSW2_Livery_Manager
                     {
                         case "-maxGameLiveries":
                             if (!int.TryParse(args[i+1], out int count)) PrintHelp();
-                            Cfg.MaxGameLiveries = count > 30 ? count : 30;
+                            Cfg.MaxGameLiveries = (count > 30 && count < 256) ? count : 30;
                             break;
                         case "-noUpdate":
                             if (!(args[i + 1] == "true" || args[i + 1] == "false")) PrintHelp();
