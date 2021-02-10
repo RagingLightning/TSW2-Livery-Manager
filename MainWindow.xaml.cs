@@ -394,6 +394,11 @@ namespace TSW2_Livery_Manager
                 lstLibraryLiveries.Items.Add($"{Display} <{file.Name}>");
                 Log.AddLogMessage($"Added library livery {file.Name} ({Display})", "MW::UpdateLocalGameLiveries", Log.LogLevel.DEBUG);
             }
+            if (lstLibraryLiveries.Items.CanSort)
+            {
+                lstLibraryLiveries.Items.SortDescriptions.Add(
+                    new SortDescription("", ListSortDirection.Ascending));
+            }
             return "OK";
         }
 
