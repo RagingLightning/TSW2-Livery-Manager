@@ -121,17 +121,17 @@ namespace TSW2_Livery_Manager
                         CurrentSuffix = VERSION.Last();
                         CurrentVersion[^1] = CurrentVersion[^1].Split(CurrentSuffix)[0];
                     }
-                    bool update = true;
+                    int update = 0;
                     bool fullVersionUpdate = true;
                     for (int i = 0; i < NewVersion.Length; i++)
                     {
-                        if (int.Parse(NewVersion[i]) < int.Parse(CurrentVersion[i]))
+                        if (int.Parse(NewVersion[i]) > int.Parse(CurrentVersion[i]))
                         {
-                            update = false;
+                            update += (int) Math.Pow(10,2-i);
                         }
                         if (int.Parse(NewVersion[i]) != int.Parse(CurrentVersion[i])) fullVersionUpdate = false;
                     }
-                    if (update || (fullVersionUpdate && CurrentSuffix != ' ')) new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/v{UpdateResponse}").ShowDialog();
+                    if (update > 0 || (fullVersionUpdate && CurrentSuffix != ' ')) new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/v{UpdateResponse}").ShowDialog();
                 }
                 catch (WebException e)
                 {
@@ -161,7 +161,7 @@ namespace TSW2_Livery_Manager
                     CurrentVersion[^1] = CurrentVersion[^1].Split(CurrentSuffix)[0];
                 }
                 bool update = false;
-                bool devUpdate = NewSuffix != ' ' && !update && (NewSuffix > CurrentSuffix || CurrentSuffix == ' ');
+                bool devUpdate = NewSuffix != ' ' && (NewSuffix > CurrentSuffix || CurrentSuffix == ' ');
                 for (int i = 0; i < NewVersion.Length; i++)
                 {
                     if (NewSuffix == ' ' && int.Parse(NewVersion[i]) > int.Parse(CurrentVersion[i]))
