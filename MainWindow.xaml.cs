@@ -125,9 +125,13 @@ namespace TSW2_Livery_Manager
                     bool fullVersionUpdate = true;
                     for (int i = 0; i < NewVersion.Length; i++)
                     {
+                        if (int.Parse(NewVersion[i]) < int.Parse(CurrentVersion[i]))
+                        {
+                            update -= (int) Math.Pow(10, 2-i);
+                        }
                         if (int.Parse(NewVersion[i]) > int.Parse(CurrentVersion[i]))
                         {
-                            update += (int) Math.Pow(10,2-i);
+                            update += (int) Math.Pow(10, 2-i);
                         }
                         if (int.Parse(NewVersion[i]) != int.Parse(CurrentVersion[i])) fullVersionUpdate = false;
                     }
