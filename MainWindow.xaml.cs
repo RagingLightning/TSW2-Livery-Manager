@@ -20,7 +20,7 @@ namespace TSW2_Livery_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string VERSION = "0.3.0";
+        private const string VERSION = "0.3.2";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -685,6 +685,8 @@ namespace TSW2_Livery_Manager
 
             int CountLocation = LocateInByteArray(AllData, COL) + COL.Length;
             AllData[CountLocation] = (byte)(SplitFile.Count() - 2);
+            string dt = DateTime.Now.ToString("yMMdd-HHmmss");
+            File.WriteAllBytes($"{Cfg.GamePath}_{dt}.bak", File.ReadAllBytes(Cfg.GamePath));
             File.WriteAllBytes(Cfg.GamePath, AllData);
             Log.AddLogMessage("Saved local game liveries to disk", "MW::SaveClick", Log.LogLevel.DEBUG);
             string Status = LoadGameLiveries();
