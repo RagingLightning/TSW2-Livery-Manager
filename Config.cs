@@ -86,7 +86,10 @@ namespace TSW2LM
 
         private void ApplyDefaults(bool save)
         {
-            _gamePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\My Games\\Trainsimworld2\\Saved\\SaveGames\\UGCLiveries_0.sav";
+            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\My Games\\Trainsimworld2"))
+                _gamePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\My Games\\Trainsimworld2\\Saved\\SaveGames\\UGCLiveries_0.sav";
+            else
+                _gamePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\My Games\\Trainsimworld2EGS\\Saved\\SaveGames\\UGCLiveries_0.sav";
             _libraryPath = "";
             _maxGameLiveries = 30;
             _noUpdate = false;

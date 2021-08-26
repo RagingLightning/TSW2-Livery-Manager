@@ -358,14 +358,14 @@ namespace TSW2_Livery_Manager
                 Cfg.GamePath = "";
                 Log.AddLogMessage($"FileNotFoundException: {e.FileName}", "MW::LoadGameLiveries", Log.LogLevel.WARNING);
                 ((Data)DataContext).Useable = false;
-                return $"!FileNotFound! game livery file - Make sure, you selected the Trainsimworld2 folder\n\nif you need help, please @RagingLightning on discord or creare an issue on github";
+                return $"!FileNotFound! game livery file - Make sure, you selected the TrainSimWorld2 (or TrainSimWorld2EGS for Epic) folder\n\nif you need help, please @RagingLightning on discord or creare an issue on github";
             }
             catch (IOException e)
             {
                 Cfg.GamePath = "";
                 Log.AddLogMessage($"IOException: {e.Message}", "MW::LoadGameLiveries", Log.LogLevel.WARNING);
                 ((Data)DataContext).Useable = false;
-                return $"!IOException! game livery file - Make sure, you selected the Trainsimworld2 folder\n\nif you need help, please @RagingLightning on discord or creare an issue on github";
+                return $"!IOException! game livery file - Make sure, you selected the TrainSimWorld2 (or TrainSimWorld2EGS for Epic) folder\n\nif you need help, please @RagingLightning on discord or creare an issue on github";
             }
         }
 
