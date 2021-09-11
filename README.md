@@ -6,7 +6,7 @@ In order to use this tool, .NET Core 3.1 needs to be installed ([DOWNLOAD](https
 
 zip-files containing all program files can be found in the [release section](https://github.com/RagingLightning/TSW2-Livery-Manager/releases/latest)
 
-##Usage
+## Usage
 A simple usage overview is provided in the project's [wiki](https://github.com/RagingLightning/TSW2-Livery-Manager/wiki/(1)-Getting-Started)
 
 ## Troubleshooting
