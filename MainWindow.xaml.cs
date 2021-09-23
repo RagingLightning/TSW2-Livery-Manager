@@ -358,14 +358,14 @@ namespace TSW2_Livery_Manager
                 Cfg.GamePath = "";
                 Log.AddLogMessage($"FileNotFoundException: {e.FileName}", "MW::LoadGameLiveries", Log.LogLevel.WARNING);
                 ((Data)DataContext).Useable = false;
-                return $"!FileNotFound! game livery file - Make sure, you selected the TrainSimWorld2 (or TrainSimWorld2EGS for Epic) folder\n\nif you need help, please @RagingLightning on discord or creare an issue on github";
+                return $"!FileNotFound! game livery file - Make sure:\n -  you selected the appropriate folder\n - have created at least one livery in the game\n\nif you need help, consult the wiki at https://github.com/RagingLightning/TSW2-Livery-Manager/wiki/(1)-Getting-Started \n or @RagingLightning on discord or creare an issue on github";
             }
             catch (IOException e)
             {
                 Cfg.GamePath = "";
                 Log.AddLogMessage($"IOException: {e.Message}", "MW::LoadGameLiveries", Log.LogLevel.WARNING);
                 ((Data)DataContext).Useable = false;
-                return $"!IOException! game livery file - Make sure, you selected the TrainSimWorld2 (or TrainSimWorld2EGS for Epic) folder\n\nif you need help, please @RagingLightning on discord or creare an issue on github";
+                return $"!IOException! game livery file - Make sure:\n -  you selected the appropriate folder\n - have created at least one livery in the game\n\nif you need help, consult the wiki at https://github.com/RagingLightning/TSW2-Livery-Manager/wiki/(1)-Getting-Started \n or @RagingLightning on discord or creare an issue on github";
             }
         }
 
@@ -465,6 +465,36 @@ namespace TSW2_Livery_Manager
 
             SplitFile.Add(Id, liveryData);
             return true;
+        }
+
+        private string DetermineWindowsStoreSaveFile()
+        {
+            string saveFilePath = Environment.SpecialFolder.LocalApplicationData + "\\Packages";
+            saveFilePath = Directory.EnumerateDirectories(saveFilePath, "DovetailGames.TrainSimWorld2021_", SearchOption.TopDirectoryOnly).First();
+            Log.AddLogMessage($"Found TrainSimWorld2021 package at '{saveFilePath}'", "MW::DetermineWindowsStoreSaveFile", Log.LogLevel.DEBUG);
+            saveFilePath += "\\SystemAppData\\wgs";
+            saveFilePath = Directory.EnumerateDirectories(saveFilePath, "*_*", SearchOption.TopDirectoryOnly).First();
+            saveFilePath = Directory.EnumerateDirectories(saveFilePath, "*", SearchOption.TopDirectoryOnly).First();
+            Log.AddLogMessage($"container idx file should be at '{saveFilePath}\\container.168'");
+            byte[] containerFile = File.ReadAllBytes(saveFilePath + "\\container.168");
+
+            byte[] key = new byte[] {0x55, 0, 0x47, 00, 0x43, 00, 0x4c, 00, 0x69, 00, 0x76, 00, 0x65, 00, 0x72, 00, 0x69, 00, 0x65, 00, 0x73, 00, 0x5f, 00, 0x30, 00};
+            int start = LocateInByteArray(containerFile, key);
+            int idx = start + key.Length;
+
+            while (containerFile[idx] == 0) idx++;
+
+            string fileBuilder = BitConverter.ToString(new byte[] {containerFile[idx + 3], containerFile[idx + 2], containerFile[idx + 1], containerFile[idx]});
+            idx += 4;
+            fileBuilder += BitConverter.ToString(new byte[] { containerFile[idx + 1], containerFile[idx] });
+            idx += 2;
+            fileBuilder += BitConverter.ToString(new byte[] { containerFile[idx + 1], containerFile[idx] });
+            idx += 2;
+            fileBuilder += BitConverter.ToString(new byte[] { containerFile[idx++], containerFile[idx++], containerFile[idx++], containerFile[idx++], containerFile[idx++], containerFile[idx++], containerFile[idx++], containerFile[idx++] });
+            fileBuilder = fileBuilder.ToUpper().Replace("-", "");
+            saveFilePath += "\\" + fileBuilder;
+            Log.AddLogMessage($"Liveries file should be at '{saveFilePath}'");
+            return saveFilePath;
         }
 
         private void btnExport_Click(object sender, RoutedEventArgs e)
@@ -626,7 +656,16 @@ namespace TSW2_Livery_Manager
             if (Dialog.ShowDialog() == true)
             {
                 Log.AddLogMessage("Changing game path...", "MW::GameDirClick", Log.LogLevel.DEBUG);
-                Cfg.GamePath = $@"{Dialog.SelectedPath}\Saved\SaveGames\UGCLiveries_0.sav";
+                if (Dialog.SelectedPath.Contains("TrainSimWorldWGDK"))
+                {
+                    Log.AddLogMessage("Detected Windows store version", "MW::GameDirClick", Log.LogLevel.DEBUG);
+                    Cfg.GamePath = DetermineWindowsStoreSaveFile();
+                }
+                else
+                {
+                    Log.AddLogMessage("Detected Steam or epic store version", "MW::GameDirClick", Log.LogLevel.DEBUG);
+                    Cfg.GamePath = $@"{Dialog.SelectedPath}\Saved\SaveGames\UGCLiveries_0.sav";
+                }
                 txtGameDir.Text = Dialog.SelectedPath;
                 Log.AddLogMessage($"Changed game path to {Cfg.GamePath}", "MW::GameDirClick");
             }
@@ -657,7 +696,7 @@ namespace TSW2_Livery_Manager
             jExportWarning = false;
             lblMessage.Content = "";
             OpenFileDialog Dialog = new OpenFileDialog();
-            Dialog.Filter = "TSW2 Livery Backup  (*.tsw2bak)|*.tsw2bak";
+            Dialog.Filter = "TSW2 Livery Backup (*.tsw2bak)|*.tsw2bak";
             Dialog.DefaultExt = "*.tsw2bak";
             Dialog.InitialDirectory = Cfg.LibraryPath;
             if (Dialog.ShowDialog() == true)
