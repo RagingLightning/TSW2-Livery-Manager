@@ -656,7 +656,7 @@ namespace TSW2_Livery_Manager
             if (Dialog.ShowDialog() == true)
             {
                 Log.AddLogMessage("Changing game path...", "MW::GameDirClick", Log.LogLevel.DEBUG);
-                if (Dialog.SelectedPath.Contains("TrainSimWorldWGDK"))
+                if (Dialog.SelectedPath.Contains("TrainSimWorld2WGDK"))
                 {
                     Log.AddLogMessage("Detected Windows store version", "MW::GameDirClick", Log.LogLevel.DEBUG);
                     Cfg.GamePath = DetermineWindowsStoreSaveFile();
