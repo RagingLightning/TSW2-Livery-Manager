@@ -20,7 +20,7 @@ namespace TSW2_Livery_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string VERSION = "0.5.0";
+        private const string VERSION = "0.5.1";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -43,6 +43,8 @@ namespace TSW2_Livery_Manager
 
         bool jImportWarning = false;
         bool jExportWarning = false;
+
+        char[] illegalFileNameCharacters = { '/', '\\', ':', '*', '?', '"', '<', '>', '|'};
 
         //0 - header data
         //1-MAX_GAME_LIVERIES - livery data
@@ -539,6 +541,8 @@ namespace TSW2_Livery_Manager
                 string Model = GetLiveryModel(LiveryData);
                 string FilePreset = $"{Model};{Name}";
                 string FileName = FilePreset;
+                foreach (char c in illegalFileNameCharacters)
+                    FileName = FileName.Replace(c, '-');
                 while (File.Exists($"{Cfg.LibraryPath}\\{FileName}.tsw2liv"))
                 {
                     if (FileName.Split('#')[0] == FileName)
