@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **Wiki**
-Confirm that you have read through the [Getting Started](https://github.com/RagingLightning/TSW2-Livery-Manager/wiki/Getting-Started) page on the project's wiki to see, if your problem is caused by a bad setup.
+Confirm that you have read through the [Getting Started](https://github.com/RagingLightning/TSW2-Livery-Manager/wiki/(1)-Getting-Started) page on the project's wiki to see, if your problem is caused by a bad setup.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
