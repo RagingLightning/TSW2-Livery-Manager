@@ -20,7 +20,7 @@ namespace TSW2_Livery_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string VERSION = "0.5.1";
+        private const string VERSION = "1.0.0";
 
         //COUNT OF LIVERIES
         readonly byte[] COL = new byte[] { 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0, 0 };
@@ -108,7 +108,9 @@ namespace TSW2_Livery_Manager
             }
             Cfg.SkipAutosave = false;
 
-            if (!Cfg.NoUpdate)
+            new UpdateNotifier().ShowDialog();
+
+            /*if (!Cfg.NoUpdate)
             {
                 try
                 {
@@ -179,7 +181,7 @@ namespace TSW2_Livery_Manager
                 }
                 if (update) new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/v{UpdateResponse}").ShowDialog();
                 else if (devUpdate) new UpdateNotifier(VERSION, UpdateResponse, $"https://github.com/RagingLightning/TSW2-Livery-Manager/releases/tag/dev-v{UpdateResponse}").ShowDialog();
-            }
+            }*/
 
             InitializeComponent();
             DataContext = new Data();
