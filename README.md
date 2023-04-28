@@ -2,7 +2,7 @@
 A helper program for Train Sim World 2, allowing for sharing of individual liveries
 
 ## Installation
-In order to use this tool, .NET Core 3.1 needs to be installed ([DOWNLOAD](https://dotnet.microsoft.com/download/dotnet-core/3.1))
+In order to use this tool, .NET 6 needs to be installed ([DOWNLOAD](https://dotnet.microsoft.com/download/))
 
 zip-files containing all program files can be found in the [release section](https://github.com/RagingLightning/TSW2-Livery-Manager/releases/latest)
 
